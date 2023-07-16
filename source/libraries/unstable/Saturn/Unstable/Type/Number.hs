@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Saturn.Unstable.Type.Number where
 
 import qualified Data.Bits as Bits

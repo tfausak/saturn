@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Saturn.Unstable.Extra.ParsecSpec where
 
 import qualified Data.Either as Either

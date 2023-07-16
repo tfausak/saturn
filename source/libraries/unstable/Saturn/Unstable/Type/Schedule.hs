@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Saturn.Unstable.Type.Schedule where
 
 import qualified Data.Text.Lazy.Builder as Builder

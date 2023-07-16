@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Saturn.Unstable.Type.Element where
 
 import qualified Data.Coerce as Coerce

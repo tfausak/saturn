@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Saturn.Unstable.Type.Wildcard where
 
 import qualified Control.Monad as Monad
