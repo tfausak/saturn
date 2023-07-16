@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Saturn.Unstable.Type.Weekday where
 
 import qualified Data.Coerce as Coerce

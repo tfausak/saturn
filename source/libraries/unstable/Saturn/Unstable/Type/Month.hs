@@ -1,4 +1,6 @@
-module Saturn.Unstable.Type.Hour where
+{-# LANGUAGE FlexibleContexts #-}
+
+module Saturn.Unstable.Type.Month where
 
 import qualified Data.Coerce as Coerce
 import qualified Data.Set as Set
@@ -7,30 +9,30 @@ import qualified Data.Word as Word
 import qualified Saturn.Unstable.Type.Field as Field
 import qualified Text.Parsec as Parsec
 
-newtype Hour
-  = Hour Field.Field
+newtype Month
+  = Month Field.Field
   deriving (Eq, Show)
 
 bounds :: (Word.Word8, Word.Word8)
-bounds = (0, 23)
+bounds = (1, 12)
 
-fromField :: Field.Field -> Maybe Hour
+fromField :: Field.Field -> Maybe Month
 fromField field =
-  if Field.isValid bounds field then Just $ Hour field else Nothing
+  if Field.isValid bounds field then Just $ Month field else Nothing
 
-toField :: Hour -> Field.Field
+toField :: Month -> Field.Field
 toField = Coerce.coerce
 
-parsec :: (Parsec.Stream s m Char) => Parsec.ParsecT s u m Hour
+parsec :: (Parsec.Stream s m Char) => Parsec.ParsecT s u m Month
 parsec = do
   field <- Field.parsec
-  maybe (fail "invalid Hour") pure $ fromField field
+  maybe (fail "invalid Month") pure $ fromField field
 
-toBuilder :: Hour -> Builder.Builder
+toBuilder :: Month -> Builder.Builder
 toBuilder = Field.toBuilder . toField
 
-expand :: Hour -> Set.Set Word.Word8
+expand :: Month -> Set.Set Word.Word8
 expand = Field.expand bounds . toField
 
-isMatch :: Word.Word8 -> Hour -> Bool
+isMatch :: Word.Word8 -> Month -> Bool
 isMatch word8 = Set.member word8 . expand
