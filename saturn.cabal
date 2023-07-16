@@ -64,6 +64,7 @@ library unstable
     Saturn.Unstable.Type.Wildcard
 
   hs-source-dirs:  source/libraries/unstable
+  visibility:      public
 
 library
   import:          library
@@ -104,6 +105,7 @@ library spec
     SaturnSpec
 
   hs-source-dirs:  source/libraries/spec
+  visibility:      public
 
 test-suite saturn-test-suite
   import:         library
