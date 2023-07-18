@@ -1,3 +1,4 @@
+import qualified Saturn.Unstable.ConstantSpec
 import qualified Saturn.Unstable.Extra.IntSpec
 import qualified Saturn.Unstable.Extra.OrdSpec
 import qualified Saturn.Unstable.Extra.ParsecSpec
@@ -21,10 +22,8 @@ import qualified SaturnSpec
 import qualified Test.Hspec as Hspec
 
 main :: IO ()
-main = Hspec.hspec $ Hspec.parallel spec
-
-spec :: Hspec.Spec
-spec = do
+main = Hspec.hspec . Hspec.parallel $ do
+  Saturn.Unstable.ConstantSpec.spec
   Saturn.Unstable.Extra.IntSpec.spec
   Saturn.Unstable.Extra.OrdSpec.spec
   Saturn.Unstable.Extra.ParsecSpec.spec

@@ -41,6 +41,12 @@
 module Saturn
   ( -- * Types
     Schedule.Schedule,
+    Constant.everyMinute,
+    Constant.hourly,
+    Constant.daily,
+    Constant.weekly,
+    Constant.monthly,
+    Constant.yearly,
 
     -- * Parsing
     Parse.fromText,
@@ -58,6 +64,7 @@ module Saturn
   )
 where
 
+import qualified Saturn.Unstable.Constant as Constant
 import qualified Saturn.Unstable.Match as Match
 import qualified Saturn.Unstable.Parse as Parse
 import qualified Saturn.Unstable.Render as Render
