@@ -76,7 +76,7 @@ library
 library spec
   import:          library
   build-depends:
-    , hspec ^>=2.11.2
+    , hspec ^>=2.9.7 || ^>=2.10.10 || ^>=2.11.2
     , parsec
     , QuickCheck ^>=2.14.3
     , saturn:unstable
@@ -112,7 +112,7 @@ library spec
 test-suite saturn-test-suite
   import:         library
   build-depends:
-    , hspec ^>=2.11.2
+    , hspec
     , saturn:spec
 
   ghc-options:    -rtsopts -threaded
