@@ -5,11 +5,17 @@
       "image": "public.ecr.aws/acilearning/haskell:9.6.2",
       "init": true,
       "volumes": [
-        "..:/workspaces/saturn",
-        "./volumes/cabal/cache:/home/vscode/.cache/cabal",
-        "./volumes/cabal/store:/home/vscode/.local/state/cabal"
+        "..:/workspace",
+        "cabal-cache:/home/vscode/.cache/cabal",
+        "cabal-state:/home/vscode/.local/state/cabal"
       ],
-      "working_dir": "/workspaces/saturn"
+      "working_dir": "/workspace"
+    }
+  },
+  "volumes": {
+    "cabal-cache": null,
+    "cabal-state": {
+      "external": true
     }
   }
 }

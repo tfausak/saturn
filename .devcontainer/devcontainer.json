@@ -3,15 +3,12 @@
     "vscode": {
       "extensions": [
         "taylorfausak.purple-yolk"
-      ],
-      "settings": {
-        "editor.formatOnSave": true
-      }
+      ]
     }
   },
   "dockerComposeFile": "compose.yaml",
+  "initializeCommand": "docker volume create cabal-state",
   "postCreateCommand": "cabal update",
-  "postStartCommand": "git config --global --add safe.directory \"$PWD\"",
   "service": "devcontainer",
-  "workspaceFolder": "/workspaces/saturn"
+  "workspaceFolder": "/workspace"
 }
