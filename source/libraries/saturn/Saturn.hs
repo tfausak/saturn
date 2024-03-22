@@ -61,6 +61,7 @@ module Saturn
     -- * Matching
     Match.isMatch,
     Match.nextMatch,
+    Match.nextMatchWithLDY,
   )
 where
 

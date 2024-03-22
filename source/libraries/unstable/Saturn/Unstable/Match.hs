@@ -87,3 +87,42 @@ incompleteNextMatch utcTime schedule = Maybe.listToMaybe $ do
       $ Time.makeTimeOfDayValid hour minute 0
   Monad.when (date == oldDate) . Monad.guard $ time > Time.utctDayTime utcTime
   pure Time.UTCTime {Time.utctDay = date, Time.utctDayTime = time}
+
+-- | Looks for the first time after the given 'Time.UTCTime' that matches the
+-- given 'Schedule.Schedule'. Returns the last day of the month instead if the 
+-- 'Schedule.Schedule' use a day that cannot happen, like February 30th.
+nextMatchWithLDY :: Time.UTCTime -> Schedule.Schedule -> Maybe Time.UTCTime
+nextMatchWithLDY utcTime schedule
+  | dayIsWildcard schedule = incompleteNextMatch utcTime schedule
+  | weekdayIsWildcard schedule = incompleteNextMatchWithLDY utcTime schedule
+  | otherwise =
+    do let wildcard = Field.fromEither . Left $ Wildcard.fromUnit ()
+       day <- Day.fromField wildcard
+       weekday <- Weekday.fromField wildcard
+       Maybe.listToMaybe . List.sort
+         $ Maybe.catMaybes
+             [incompleteNextMatch utcTime schedule {Schedule.day = day},
+              incompleteNextMatchWithLDY
+                utcTime schedule {Schedule.weekday = weekday}]
+
+incompleteNextMatchWithLDY :: Time.UTCTime -> Schedule.Schedule -> Maybe Time.UTCTime
+incompleteNextMatchWithLDY utcTime schedule = Maybe.listToMaybe $ do
+  let oldDate = Time.utctDay utcTime
+  let (oldYear, _, _) = Time.toGregorian oldDate
+  year <- [oldYear .. oldYear + 8]
+  month <- fmap Int.fromWord8 . Set.toAscList . Month.expand $ Schedule.month schedule
+  day <- fmap Int.fromWord8 . Set.toAscList . Day.expand $ Schedule.day schedule
+  date <- [Time.fromGregorian year month day]
+  Monad.guard $ date >= oldDate
+  Monad.guard
+    . Set.member (Time.dayOfWeekToWord8 $ Time.dayOfWeek date)
+    . Weekday.expand
+    $ Schedule.weekday schedule
+  hour <- fmap Int.fromWord8 . Set.toAscList . Hour.expand $ Schedule.hour schedule
+  minute <- fmap Int.fromWord8 . Set.toAscList . Minute.expand $ Schedule.minute schedule
+  time <-
+    fmap Time.sinceMidnight
+      . Maybe.maybeToList
+      $ Time.makeTimeOfDayValid hour minute 0
+  Monad.when (date == oldDate) . Monad.guard $ time > Time.utctDayTime utcTime
+  pure Time.UTCTime {Time.utctDay = date, Time.utctDayTime = time}
