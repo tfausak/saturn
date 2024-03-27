@@ -91,10 +91,10 @@ incompleteNextMatch utcTime schedule = Maybe.listToMaybe $ do
 -- | Looks for the first time after the given 'Time.UTCTime' that matches the
 -- given 'Schedule.Schedule'. Returns the last day of the month instead if the 
 -- 'Schedule.Schedule' use a day that cannot happen, like February 30th.
-nextMatchWithLDY :: Time.UTCTime -> Schedule.Schedule -> Maybe Time.UTCTime
-nextMatchWithLDY utcTime schedule
+nextMatchWithLDM :: Time.UTCTime -> Schedule.Schedule -> Maybe Time.UTCTime
+nextMatchWithLDM utcTime schedule
   | dayIsWildcard schedule = incompleteNextMatch utcTime schedule
-  | weekdayIsWildcard schedule = incompleteNextMatchWithLDY utcTime schedule
+  | weekdayIsWildcard schedule = incompleteNextMatchWithLDM utcTime schedule
   | otherwise =
     do let wildcard = Field.fromEither . Left $ Wildcard.fromUnit ()
        day <- Day.fromField wildcard
@@ -102,11 +102,11 @@ nextMatchWithLDY utcTime schedule
        Maybe.listToMaybe . List.sort
          $ Maybe.catMaybes
              [incompleteNextMatch utcTime schedule {Schedule.day = day},
-              incompleteNextMatchWithLDY
+              incompleteNextMatchWithLDM
                 utcTime schedule {Schedule.weekday = weekday}]
 
-incompleteNextMatchWithLDY :: Time.UTCTime -> Schedule.Schedule -> Maybe Time.UTCTime
-incompleteNextMatchWithLDY utcTime schedule = Maybe.listToMaybe $ do
+incompleteNextMatchWithLDM :: Time.UTCTime -> Schedule.Schedule -> Maybe Time.UTCTime
+incompleteNextMatchWithLDM utcTime schedule = Maybe.listToMaybe $ do
   let oldDate = Time.utctDay utcTime
   let (oldYear, _, _) = Time.toGregorian oldDate
   year <- [oldYear .. oldYear + 8]
