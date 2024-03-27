@@ -407,6 +407,43 @@ spec = Hspec.describe "Saturn.Unstable.Match" $ do
         t2 <- maybe (fail "impossible") pure $ Match.nextMatch t1 schedule
         schedule `Hspec.shouldSatisfy` Match.isMatch t2
 
+  Hspec.describe "nextMatchWithLDY" $ do
+    Hspec.it "succeeds with a 29 day on Janurary" $ do
+      s <- ScheduleSpec.new [[0]] [[0]] [[29]] [] []
+      t1 <- newUtcTime 1970 1 1 0 0 0
+      t2 <- newUtcTime 1970 1 29 0 0 0
+      Match.nextMatchWithLDY t1 s `Hspec.shouldBe` Just t2
+
+    Hspec.it "succeeds with a 29 day on Febrary of a regular year" $ do
+      s <- ScheduleSpec.new [[0]] [[0]] [[29]] [] []
+      t1 <- newUtcTime 1970 2 1 0 0 0
+      t2 <- newUtcTime 1970 2 28 0 0 0
+      Match.nextMatchWithLDY t1 s `Hspec.shouldBe` Just t2
+
+    Hspec.it "succeeds with a 29 day on Febrary of a leap year" $ do
+      s <- ScheduleSpec.new [[0]] [[0]] [[29]] [] []
+      t1 <- newUtcTime 1972 2 1 0 0 0
+      t2 <- newUtcTime 1972 2 29 0 0 0
+      Match.nextMatchWithLDY t1 s `Hspec.shouldBe` Just t2
+
+    Hspec.it "succeeds with a 30 day on April" $ do
+      s <- ScheduleSpec.new [[0]] [[0]] [[30]] [] []
+      t1 <- newUtcTime 1970 4 1 0 0 0
+      t2 <- newUtcTime 1970 4 30 0 0 0
+      Match.nextMatchWithLDY t1 s `Hspec.shouldBe` Just t2
+
+    Hspec.it "succeeds with a 30 day on Febrary of a leap year" $ do
+      s <- ScheduleSpec.new [[0]] [[0]] [[30]] [] []
+      t1 <- newUtcTime 1972 2 1 0 0 0
+      t2 <- newUtcTime 1972 2 29 0 0 0
+      Match.nextMatchWithLDY t1 s `Hspec.shouldBe` Just t2
+
+    Hspec.it "succeeds with a 31 day on April" $ do
+      s <- ScheduleSpec.new [[0]] [[0]] [[31]] [] []
+      t1 <- newUtcTime 1970 4 1 0 0 0
+      t2 <- newUtcTime 1970 4 30 0 0 0
+      Match.nextMatchWithLDY t1 s `Hspec.shouldBe` Just t2
+
 withMinute :: Int -> Time.UTCTime -> Time.UTCTime
 withMinute minute = overTimeOfDay $ \timeOfDay -> timeOfDay {Time.todMin = minute}
 
