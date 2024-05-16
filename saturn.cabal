@@ -78,7 +78,7 @@ library spec
   build-depends:
     , hspec ^>=2.9.0 || ^>=2.10.0 || ^>=2.11.0
     , parsec
-    , QuickCheck ^>=2.14.3
+    , QuickCheck ^>=2.14.3 || ^>=2.15
     , saturn:unstable
     , text
     , time
