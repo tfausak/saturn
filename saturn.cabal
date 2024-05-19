@@ -1,47 +1,54 @@
-cabal-version:   3.0
-name:            saturn
-version:         1.0.0.4
-synopsis:        Handle POSIX cron schedules.
-description:     Saturn handles POSIX cron schedules.
-build-type:      Simple
-category:        Cron
+cabal-version: 3.0
+name: saturn
+version: 1.0.0.4
+synopsis: Handle POSIX cron schedules.
+description: Saturn handles POSIX cron schedules.
+build-type: Simple
+category: Cron
 extra-doc-files:
-  CHANGELOG.markdown
-  README.markdown
+  CHANGELOG.md
+  README.md
 
-maintainer:      Taylor Fausak
-license:         MIT
-license-file:    LICENSE.markdown
+maintainer: Taylor Fausak
+license: MIT
+license-file: LICENSE.txt
 
 source-repository head
   location: https://github.com/tfausak/saturn
-  type:     git
+  type: git
 
 flag pedantic
   default: False
-  manual:  True
+  manual: True
 
 common library
-  build-depends:    base ^>=4.16.0 || ^>=4.17.0 || ^>=4.18.0 || ^>=4.19.0
+  build-depends: base ^>=4.18.0.0 || ^>=4.19.0.0 || ^>=4.20.0.0
   default-language: Haskell2010
   ghc-options:
-    -Weverything -Wno-all-missed-specialisations -Wno-implicit-prelude
-    -Wno-missed-specialisations -Wno-missing-deriving-strategies
-    -Wno-missing-export-lists -Wno-missing-kind-signatures
-    -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
-    -Wno-safe -Wno-unsafe
+    -Weverything
+    -Wno-all-missed-specialisations
+    -Wno-implicit-prelude
+    -Wno-missed-specialisations
+    -Wno-missing-deriving-strategies
+    -Wno-missing-export-lists
+    -Wno-missing-kind-signatures
+    -Wno-missing-safe-haskell-mode
+    -Wno-prepositive-qualified-module
+    -Wno-safe
+    -Wno-unsafe
 
   if flag(pedantic)
     ghc-options: -Werror
 
 library unstable
-  import:          library
+  import: library
   build-depends:
-    , containers ^>=0.6.5
-    , parsec ^>=3.1.14
-    , text ^>=1.2.5 || ^>=2.0.2 || ^>=2.1
-    , time ^>=1.11.1 || ^>=1.12.2
+    containers ^>=0.6.7 || ^>=0.7,
+    parsec ^>=3.1.16.1,
+    text ^>=2.0.2 || ^>=2.1,
+    time ^>=1.12.2 || ^>=1.14,
 
+  -- cabal-gild: discover source/libraries/unstable
   exposed-modules:
     Saturn.Unstable.Constant
     Saturn.Unstable.Extra.Int
@@ -64,25 +71,27 @@ library unstable
     Saturn.Unstable.Type.Weekday
     Saturn.Unstable.Type.Wildcard
 
-  hs-source-dirs:  source/libraries/unstable
-  visibility:      public
+  hs-source-dirs: source/libraries/unstable
+  visibility: public
 
 library
-  import:          library
-  build-depends:   saturn:unstable
+  import: library
+  build-depends: saturn:unstable
+  -- cabal-gild: discover source/libraries/saturn
   exposed-modules: Saturn
-  hs-source-dirs:  source/libraries/saturn
+  hs-source-dirs: source/libraries/saturn
 
 library spec
-  import:          library
+  import: library
   build-depends:
-    , hspec ^>=2.9.0 || ^>=2.10.0 || ^>=2.11.0
-    , parsec
-    , QuickCheck ^>=2.14.3 || ^>=2.15
-    , saturn:unstable
-    , text
-    , time
+    QuickCheck ^>=2.14.3 || ^>=2.15,
+    hspec ^>=2.11.8,
+    parsec,
+    saturn:unstable,
+    text,
+    time,
 
+  -- cabal-gild: discover source/libraries/spec
   exposed-modules:
     Saturn.Unstable.ConstantSpec
     Saturn.Unstable.Extra.IntSpec
@@ -106,16 +115,19 @@ library spec
     Saturn.Unstable.Type.WildcardSpec
     SaturnSpec
 
-  hs-source-dirs:  source/libraries/spec
-  visibility:      public
+  hs-source-dirs: source/libraries/spec
+  visibility: public
 
 test-suite saturn-test-suite
-  import:         library
+  import: library
   build-depends:
-    , hspec
-    , saturn:spec
+    hspec,
+    saturn:spec,
 
-  ghc-options:    -rtsopts -threaded
+  ghc-options:
+    -rtsopts
+    -threaded
+
   hs-source-dirs: source/test-suite
-  main-is:        Main.hs
-  type:           exitcode-stdio-1.0
+  main-is: Main.hs
+  type: exitcode-stdio-1.0
