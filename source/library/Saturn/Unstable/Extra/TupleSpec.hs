@@ -1,20 +1,20 @@
 module Saturn.Unstable.Extra.TupleSpec where
 
+import qualified Heck
 import qualified Saturn.Unstable.Extra.Tuple as Tuple
-import qualified Test.Hspec as Hspec
 
-spec :: Hspec.Spec
-spec = Hspec.describe "Saturn.Unstable.Extra.Tuple" $ do
-  Hspec.describe "mapBoth" $ do
-    Hspec.it "works" $ do
-      Tuple.mapBoth succ ('A', 'a') `Hspec.shouldBe` ('B', 'b')
+spec :: (Applicative m, Monad n) => Heck.Test m n -> n ()
+spec t = Heck.describe t "Saturn.Unstable.Extra.Tuple" $ do
+  Heck.describe t "mapBoth" $ do
+    Heck.it t "works" $ do
+      Heck.assertEq t ('B', 'b') (Tuple.mapBoth succ ('A', 'a'))
 
-  Hspec.describe "toSequence" $ do
-    Hspec.it "works" $ do
-      Tuple.toSequence ('b', 'd') `Hspec.shouldBe` "bcd"
+  Heck.describe t "toSequence" $ do
+    Heck.it t "works" $ do
+      Heck.assertEq t "bcd" (Tuple.toSequence ('b', 'd'))
 
-    Hspec.it "works with singleton" $ do
-      Tuple.toSequence ('a', 'a') `Hspec.shouldBe` "a"
+    Heck.it t "works with singleton" $ do
+      Heck.assertEq t "a" (Tuple.toSequence ('a', 'a'))
 
-    Hspec.it "works with empty" $ do
-      Tuple.toSequence ('b', 'a') `Hspec.shouldBe` ""
+    Heck.it t "works with empty" $ do
+      Heck.assertEq t "" (Tuple.toSequence ('b', 'a'))

@@ -1,22 +1,22 @@
 module Saturn.Unstable.Extra.OrdSpec where
 
+import qualified Heck
 import qualified Saturn.Unstable.Extra.Ord as Ord
-import qualified Test.Hspec as Hspec
 
-spec :: Hspec.Spec
-spec = Hspec.describe "Saturn.Unstable.Extra.Ord" $ do
-  Hspec.describe "within" $ do
-    Hspec.it "fails below lower bound" $ do
-      'a' `Hspec.shouldNotSatisfy` Ord.within ('b', 'd')
+spec :: (Applicative m, Monad n) => Heck.Test m n -> n ()
+spec t = Heck.describe t "Saturn.Unstable.Extra.Ord" $ do
+  Heck.describe t "within" $ do
+    Heck.it t "fails below lower bound" $ do
+      Heck.assertEq t False (Ord.within ('b', 'd') 'a')
 
-    Hspec.it "succeeds at lower bound" $ do
-      'b' `Hspec.shouldSatisfy` Ord.within ('b', 'd')
+    Heck.it t "succeeds at lower bound" $ do
+      Heck.assertEq t True (Ord.within ('b', 'd') 'b')
 
-    Hspec.it "succeeds within bounds" $ do
-      'c' `Hspec.shouldSatisfy` Ord.within ('b', 'd')
+    Heck.it t "succeeds within bounds" $ do
+      Heck.assertEq t True (Ord.within ('b', 'd') 'c')
 
-    Hspec.it "succeeds at upper bound" $ do
-      'd' `Hspec.shouldSatisfy` Ord.within ('b', 'd')
+    Heck.it t "succeeds at upper bound" $ do
+      Heck.assertEq t True (Ord.within ('b', 'd') 'd')
 
-    Hspec.it "fails above upper bound" $ do
-      'e' `Hspec.shouldNotSatisfy` Ord.within ('b', 'd')
+    Heck.it t "fails above upper bound" $ do
+      Heck.assertEq t False (Ord.within ('b', 'd') 'e')

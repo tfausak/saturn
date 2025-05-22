@@ -1,214 +1,214 @@
 module Saturn.Unstable.ParseSpec where
 
 import qualified Data.Either as Either
+import qualified Heck
 import qualified Saturn.Unstable.Parse as Parse
 import qualified Saturn.Unstable.Type.ScheduleSpec as ScheduleSpec
-import qualified Test.Hspec as Hspec
 
-spec :: Hspec.Spec
-spec = Hspec.describe "Saturn.Unstable.Parse" $ do
-  Hspec.describe "fromString" $ do
-    Hspec.it "accepts wildcards" $ do
+spec :: (MonadFail m, Monad n) => Heck.Test m n -> n ()
+spec t = Heck.describe t "Saturn.Unstable.Parse" $ do
+  Heck.describe t "fromString" $ do
+    Heck.it t "accepts wildcards" $ do
       schedule <- ScheduleSpec.new [] [] [] [] []
-      Parse.fromString "* * * * *" `Hspec.shouldBe` Right schedule
+      Heck.assertEq t (Right schedule) (Parse.fromString "* * * * *")
 
-    Hspec.it "accepts extra spaces" $ do
+    Heck.it t "accepts extra spaces" $ do
       schedule <- ScheduleSpec.new [] [] [] [] []
-      Parse.fromString "  *  *  *  *  *  " `Hspec.shouldBe` Right schedule
+      Heck.assertEq t (Right schedule) (Parse.fromString "  *  *  *  *  *  ")
 
-    Hspec.it "accepts numbers" $ do
+    Heck.it t "accepts numbers" $ do
       schedule <- ScheduleSpec.new [[4]] [[3]] [[2]] [[1]] [[0]]
-      Parse.fromString "4 3 2 1 0" `Hspec.shouldBe` Right schedule
+      Heck.assertEq t (Right schedule) (Parse.fromString "4 3 2 1 0")
 
-    Hspec.it "accepts ranges" $ do
+    Heck.it t "accepts ranges" $ do
       schedule <- ScheduleSpec.new [[8, 9]] [[6, 7]] [[4, 5]] [[2, 3]] [[0, 1]]
-      Parse.fromString "8-9 6-7 4-5 2-3 0-1" `Hspec.shouldBe` Right schedule
+      Heck.assertEq t (Right schedule) (Parse.fromString "8-9 6-7 4-5 2-3 0-1")
 
-    Hspec.it "accepts choices" $ do
+    Heck.it t "accepts choices" $ do
       schedule <- ScheduleSpec.new [[8], [9]] [[6], [7]] [[4], [5]] [[2], [3]] [[0], [1]]
-      Parse.fromString "8,9 6,7 4,5 2,3 0,1" `Hspec.shouldBe` Right schedule
+      Heck.assertEq t (Right schedule) (Parse.fromString "8,9 6,7 4,5 2,3 0,1")
 
-    Hspec.describe "minute" $ do
-      Hspec.it "accepts a number" $ do
+    Heck.describe t "minute" $ do
+      Heck.it t "accepts a number" $ do
         schedule <- ScheduleSpec.new [[0]] [] [] [] []
-        Parse.fromString "0 * * * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "0 * * * *")
 
-      Hspec.it "accepts a range" $ do
+      Heck.it t "accepts a range" $ do
         schedule <- ScheduleSpec.new [[0, 1]] [] [] [] []
-        Parse.fromString "0-1 * * * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "0-1 * * * *")
 
-      Hspec.it "accepts a choice" $ do
+      Heck.it t "accepts a choice" $ do
         schedule <- ScheduleSpec.new [[0], [1]] [] [] [] []
-        Parse.fromString "0,1 * * * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "0,1 * * * *")
 
-      Hspec.it "rejects two wildcards" $ do
-        Parse.fromString "*,* * * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects two wildcards" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "*,* * * * *"))
 
-      Hspec.it "rejects a wildcard and a number" $ do
-        Parse.fromString "*,0 * * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "*,0 * * * *"))
 
-      Hspec.it "rejects a wildcard and a range" $ do
-        Parse.fromString "*,0-0 * * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "*,0-0 * * * *"))
 
-      Hspec.it "rejects an out of bounds number" $ do
-        Parse.fromString "60 * * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "60 * * * *"))
 
-      Hspec.it "rejects an out of bounds number as part of a choice" $ do
-        Parse.fromString "0,60 * * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number as part of a choice" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "0,60 * * * *"))
 
-      Hspec.it "rejects an out of bounds range" $ do
-        Parse.fromString "60-61 * * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "60-61 * * * *"))
 
-      Hspec.it "rejects a half out of bounds range" $ do
-        Parse.fromString "0-60 * * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a half out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "0-60 * * * *"))
 
-      Hspec.it "rejects a backwards range" $ do
-        Parse.fromString "1-0 * * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a backwards range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "1-0 * * * *"))
 
-    Hspec.describe "hour" $ do
-      Hspec.it "accepts a number" $ do
+    Heck.describe t "hour" $ do
+      Heck.it t "accepts a number" $ do
         schedule <- ScheduleSpec.new [] [[0]] [] [] []
-        Parse.fromString "* 0 * * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* 0 * * *")
 
-      Hspec.it "accepts a range" $ do
+      Heck.it t "accepts a range" $ do
         schedule <- ScheduleSpec.new [] [[0, 1]] [] [] []
-        Parse.fromString "* 0-1 * * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* 0-1 * * *")
 
-      Hspec.it "accepts a choice" $ do
+      Heck.it t "accepts a choice" $ do
         schedule <- ScheduleSpec.new [] [[0], [1]] [] [] []
-        Parse.fromString "* 0,1 * * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* 0,1 * * *")
 
-      Hspec.it "rejects two wildcards" $ do
-        Parse.fromString "* *,* * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects two wildcards" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* *,* * * *"))
 
-      Hspec.it "rejects a wildcard and a number" $ do
-        Parse.fromString "* *,0 * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* *,0 * * *"))
 
-      Hspec.it "rejects a wildcard and a range" $ do
-        Parse.fromString "* *,0-0 * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* *,0-0 * * *"))
 
-      Hspec.it "rejects an out of bounds number" $ do
-        Parse.fromString "* 24 * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* 24 * * *"))
 
-      Hspec.it "rejects an out of bounds number as part of a choice" $ do
-        Parse.fromString "* 0,24 * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number as part of a choice" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* 0,24 * * *"))
 
-      Hspec.it "rejects an out of bounds range" $ do
-        Parse.fromString "* 24-25 * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* 24-25 * * *"))
 
-      Hspec.it "rejects a half out of bounds range" $ do
-        Parse.fromString "* 0-24 * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a half out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* 0-24 * * *"))
 
-      Hspec.it "rejects a backwards range" $ do
-        Parse.fromString "* 1-0 * * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a backwards range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* 1-0 * * *"))
 
-    Hspec.describe "day" $ do
-      Hspec.it "accepts a number" $ do
+    Heck.describe t "day" $ do
+      Heck.it t "accepts a number" $ do
         schedule <- ScheduleSpec.new [] [] [[1]] [] []
-        Parse.fromString "* * 1 * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * 1 * *")
 
-      Hspec.it "accepts a range" $ do
+      Heck.it t "accepts a range" $ do
         schedule <- ScheduleSpec.new [] [] [[1, 2]] [] []
-        Parse.fromString "* * 1-2 * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * 1-2 * *")
 
-      Hspec.it "accepts a choice" $ do
+      Heck.it t "accepts a choice" $ do
         schedule <- ScheduleSpec.new [] [] [[1], [2]] [] []
-        Parse.fromString "* * 1,2 * *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * 1,2 * *")
 
-      Hspec.it "rejects two wildcards" $ do
-        Parse.fromString "* * *,* * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects two wildcards" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * *,* * *"))
 
-      Hspec.it "rejects a wildcard and a number" $ do
-        Parse.fromString "* * *,1 * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * *,1 * *"))
 
-      Hspec.it "rejects a wildcard and a range" $ do
-        Parse.fromString "* * *,1-1 * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * *,1-1 * *"))
 
-      Hspec.it "rejects an out of bounds number" $ do
-        Parse.fromString "* * 32 * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * 32 * *"))
 
-      Hspec.it "rejects an out of bounds number as part of a choice" $ do
-        Parse.fromString "* * 1,32 * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number as part of a choice" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * 1,32 * *"))
 
-      Hspec.it "rejects an out of bounds range" $ do
-        Parse.fromString "* * 32-33 * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * 32-33 * *"))
 
-      Hspec.it "rejects a half out of bounds range" $ do
-        Parse.fromString "* * 1-32 * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a half out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * 1-32 * *"))
 
-      Hspec.it "rejects a backwards range" $ do
-        Parse.fromString "* * 2-1 * *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a backwards range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * 2-1 * *"))
 
-    Hspec.describe "month" $ do
-      Hspec.it "accepts a number" $ do
+    Heck.describe t "month" $ do
+      Heck.it t "accepts a number" $ do
         schedule <- ScheduleSpec.new [] [] [] [[1]] []
-        Parse.fromString "* * * 1 *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * * 1 *")
 
-      Hspec.it "accepts a range" $ do
+      Heck.it t "accepts a range" $ do
         schedule <- ScheduleSpec.new [] [] [] [[1, 2]] []
-        Parse.fromString "* * * 1-2 *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * * 1-2 *")
 
-      Hspec.it "accepts a choice" $ do
+      Heck.it t "accepts a choice" $ do
         schedule <- ScheduleSpec.new [] [] [] [[1], [2]] []
-        Parse.fromString "* * * 1,2 *" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * * 1,2 *")
 
-      Hspec.it "rejects two wildcards" $ do
-        Parse.fromString "* * * *,* *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects two wildcards" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * *,* *"))
 
-      Hspec.it "rejects a wildcard and a number" $ do
-        Parse.fromString "* * * *,1 *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * *,1 *"))
 
-      Hspec.it "rejects a wildcard and a range" $ do
-        Parse.fromString "* * * *,1-1 *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * *,1-1 *"))
 
-      Hspec.it "rejects an out of bounds number" $ do
-        Parse.fromString "* * * 13 *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * 13 *"))
 
-      Hspec.it "rejects an out of bounds number as part of a choice" $ do
-        Parse.fromString "* * * 1,13 *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number as part of a choice" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * 1,13 *"))
 
-      Hspec.it "rejects an out of bounds range" $ do
-        Parse.fromString "* * * 13-14 *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * 13-14 *"))
 
-      Hspec.it "rejects a half out of bounds range" $ do
-        Parse.fromString "* * * 1-13 *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a half out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * 1-13 *"))
 
-      Hspec.it "rejects a backwards range" $ do
-        Parse.fromString "* * * 2-1 *" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a backwards range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * 2-1 *"))
 
-    Hspec.describe "weekday" $ do
-      Hspec.it "accepts a number" $ do
+    Heck.describe t "weekday" $ do
+      Heck.it t "accepts a number" $ do
         schedule <- ScheduleSpec.new [] [] [] [] [[0]]
-        Parse.fromString "* * * * 0" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * * * 0")
 
-      Hspec.it "accepts a range" $ do
+      Heck.it t "accepts a range" $ do
         schedule <- ScheduleSpec.new [] [] [] [] [[0, 1]]
-        Parse.fromString "* * * * 0-1" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * * * 0-1")
 
-      Hspec.it "accepts a choice" $ do
+      Heck.it t "accepts a choice" $ do
         schedule <- ScheduleSpec.new [] [] [] [] [[0], [1]]
-        Parse.fromString "* * * * 0,1" `Hspec.shouldBe` Right schedule
+        Heck.assertEq t (Right schedule) (Parse.fromString "* * * * 0,1")
 
-      Hspec.it "rejects two wildcards" $ do
-        Parse.fromString "* * * * *,*" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects two wildcards" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * * *,*"))
 
-      Hspec.it "rejects a wildcard and a number" $ do
-        Parse.fromString "* * * * *,0" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * * *,0"))
 
-      Hspec.it "rejects a wildcard and a range" $ do
-        Parse.fromString "* * * * *,0-0" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a wildcard and a range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * * *,0-0"))
 
-      Hspec.it "rejects an out of bounds number" $ do
-        Parse.fromString "* * * * 7" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * * 7"))
 
-      Hspec.it "rejects an out of bounds number as part of a choice" $ do
-        Parse.fromString "* * * * 0,7" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds number as part of a choice" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * * 0,7"))
 
-      Hspec.it "rejects an out of bounds range" $ do
-        Parse.fromString "* * * * 7-8" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects an out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * * 7-8"))
 
-      Hspec.it "rejects a half out of bounds range" $ do
-        Parse.fromString "* * * * 0-7" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a half out of bounds range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * * 0-7"))
 
-      Hspec.it "rejects a backwards range" $ do
-        Parse.fromString "* * * * 1-0" `Hspec.shouldSatisfy` Either.isLeft
+      Heck.it t "rejects a backwards range" $ do
+        Heck.assertEq t True (Either.isLeft (Parse.fromString "* * * * 1-0"))

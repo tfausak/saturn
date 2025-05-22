@@ -1,31 +1,31 @@
 module Saturn.Unstable.ConstantSpec where
 
+import qualified Heck
 import qualified Saturn.Unstable.Constant as Constant
 import qualified Saturn.Unstable.Render as Render
-import qualified Test.Hspec as Hspec
 
-spec :: Hspec.Spec
-spec = Hspec.describe "Saturn.Unstable.Constant" $ do
-  Hspec.describe "everyMinute" $ do
-    Hspec.it "renders correctly" $ do
-      Render.toString Constant.everyMinute `Hspec.shouldBe` "* * * * *"
+spec :: (Applicative m, Monad n) => Heck.Test m n -> n ()
+spec t = Heck.describe t "Saturn.Unstable.Constant" $ do
+  Heck.describe t "everyMinute" $ do
+    Heck.it t "renders correctly" $ do
+      Heck.assertEq t "* * * * *" (Render.toString Constant.everyMinute)
 
-  Hspec.describe "hourly" $ do
-    Hspec.it "renders correctly" $ do
-      Render.toString Constant.hourly `Hspec.shouldBe` "0 * * * *"
+  Heck.describe t "hourly" $ do
+    Heck.it t "renders correctly" $ do
+      Heck.assertEq t "0 * * * *" (Render.toString Constant.hourly)
 
-  Hspec.describe "daily" $ do
-    Hspec.it "renders correctly" $ do
-      Render.toString Constant.daily `Hspec.shouldBe` "0 0 * * *"
+  Heck.describe t "daily" $ do
+    Heck.it t "renders correctly" $ do
+      Heck.assertEq t "0 0 * * *" (Render.toString Constant.daily)
 
-  Hspec.describe "weekly" $ do
-    Hspec.it "renders correctly" $ do
-      Render.toString Constant.weekly `Hspec.shouldBe` "0 0 * * 0"
+  Heck.describe t "weekly" $ do
+    Heck.it t "renders correctly" $ do
+      Heck.assertEq t "0 0 * * 0" (Render.toString Constant.weekly)
 
-  Hspec.describe "monthly" $ do
-    Hspec.it "renders correctly" $ do
-      Render.toString Constant.monthly `Hspec.shouldBe` "0 0 1 * *"
+  Heck.describe t "monthly" $ do
+    Heck.it t "renders correctly" $ do
+      Heck.assertEq t "0 0 1 * *" (Render.toString Constant.monthly)
 
-  Hspec.describe "yearly" $ do
-    Hspec.it "renders correctly" $ do
-      Render.toString Constant.yearly `Hspec.shouldBe` "0 0 1 1 *"
+  Heck.describe t "yearly" $ do
+    Heck.it t "renders correctly" $ do
+      Heck.assertEq t "0 0 1 1 *" (Render.toString Constant.yearly)

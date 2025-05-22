@@ -45,6 +45,7 @@ library
   build-depends:
     QuickCheck ^>=2.14.3 || ^>=2.15,
     containers ^>=0.6.7 || ^>=0.7,
+    heck ^>=0.2025.5.22,
     hspec ^>=2.11.8,
     parsec ^>=3.1.16.1,
     text ^>=2.0.2 || ^>=2.1,
@@ -100,7 +101,9 @@ library
 test-suite saturn-test-suite
   import: library
   build-depends:
+    heck,
     hspec,
+    hspec-core,
     saturn,
 
   ghc-options:

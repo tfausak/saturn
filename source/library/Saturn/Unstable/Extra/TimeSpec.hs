@@ -1,29 +1,29 @@
 module Saturn.Unstable.Extra.TimeSpec where
 
 import qualified Data.Time as Time
+import qualified Heck
 import qualified Saturn.Unstable.Extra.Time as Time
-import qualified Test.Hspec as Hspec
 
-spec :: Hspec.Spec
-spec = Hspec.describe "Saturn.Unstable.Extra.Time" $ do
-  Hspec.describe "dayOfWeekToWord8" $ do
-    Hspec.it "works with Sunday" $ do
-      Time.dayOfWeekToWord8 Time.Sunday `Hspec.shouldBe` 0
+spec :: (Applicative m, Monad n) => Heck.Test m n -> n ()
+spec t = Heck.describe t "Saturn.Unstable.Extra.Time" $ do
+  Heck.describe t "dayOfWeekToWord8" $ do
+    Heck.it t "works with Sunday" $ do
+      Heck.assertEq t 0 (Time.dayOfWeekToWord8 Time.Sunday)
 
-    Hspec.it "works with Monday" $ do
-      Time.dayOfWeekToWord8 Time.Monday `Hspec.shouldBe` 1
+    Heck.it t "works with Monday" $ do
+      Heck.assertEq t 1 (Time.dayOfWeekToWord8 Time.Monday)
 
-    Hspec.it "works with Tuesday" $ do
-      Time.dayOfWeekToWord8 Time.Tuesday `Hspec.shouldBe` 2
+    Heck.it t "works with Tuesday" $ do
+      Heck.assertEq t 2 (Time.dayOfWeekToWord8 Time.Tuesday)
 
-    Hspec.it "works with Wednesday" $ do
-      Time.dayOfWeekToWord8 Time.Wednesday `Hspec.shouldBe` 3
+    Heck.it t "works with Wednesday" $ do
+      Heck.assertEq t 3 (Time.dayOfWeekToWord8 Time.Wednesday)
 
-    Hspec.it "works with Thursday" $ do
-      Time.dayOfWeekToWord8 Time.Thursday `Hspec.shouldBe` 4
+    Heck.it t "works with Thursday" $ do
+      Heck.assertEq t 4 (Time.dayOfWeekToWord8 Time.Thursday)
 
-    Hspec.it "works with Friday" $ do
-      Time.dayOfWeekToWord8 Time.Friday `Hspec.shouldBe` 5
+    Heck.it t "works with Friday" $ do
+      Heck.assertEq t 5 (Time.dayOfWeekToWord8 Time.Friday)
 
-    Hspec.it "works with Saturday" $ do
-      Time.dayOfWeekToWord8 Time.Saturday `Hspec.shouldBe` 6
+    Heck.it t "works with Saturday" $ do
+      Heck.assertEq t 6 (Time.dayOfWeekToWord8 Time.Saturday)
