@@ -84,7 +84,7 @@ library
 library spec
   import: library
   build-depends:
-    QuickCheck ^>=2.14.3 || ^>=2.15,
+    QuickCheck ^>=2.14.3 || ^>=2.15 || ^>2.16,
     hspec ^>=2.11.8,
     parsec,
     saturn:unstable,
