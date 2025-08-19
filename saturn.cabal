@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: saturn
-version: 1.0.0.8
+version: 1.0.0.9
 synopsis: Handle POSIX cron schedules.
 description: Saturn handles POSIX cron schedules.
 build-type: Simple
@@ -43,7 +43,7 @@ common library
 library
   import: library
   build-depends:
-    QuickCheck ^>=2.14.3 || ^>=2.15,
+    QuickCheck ^>=2.14.3 || ^>=2.15 || ^>=2.16,
     containers ^>=0.6.7 || ^>=0.7,
     heck ^>=0.2025.5.22,
     hspec ^>=2.11.8,
@@ -97,6 +97,7 @@ library
     SaturnSpec
 
   hs-source-dirs: source/library
+  visibility: public
 
 test-suite saturn-test-suite
   import: library
