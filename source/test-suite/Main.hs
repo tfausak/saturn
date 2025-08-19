@@ -31,21 +31,21 @@ main = Hspec.hspec . Hspec.parallel $ do
   Saturn.Unstable.Extra.ParsecSpec.spec heck
   Saturn.Unstable.Extra.TimeSpec.spec heck
   Saturn.Unstable.Extra.TupleSpec.spec heck
-  Saturn.Unstable.MatchSpec.spec
+  Saturn.Unstable.MatchSpec.spec heck
   Saturn.Unstable.ParseSpec.spec heck
   Saturn.Unstable.RenderSpec.spec heck
-  Saturn.Unstable.Type.DaySpec.spec
-  Saturn.Unstable.Type.ElementSpec.spec
-  Saturn.Unstable.Type.FieldSpec.spec
-  Saturn.Unstable.Type.HourSpec.spec
-  Saturn.Unstable.Type.MinuteSpec.spec
-  Saturn.Unstable.Type.MonthSpec.spec
-  Saturn.Unstable.Type.NumberSpec.spec
-  Saturn.Unstable.Type.RangeSpec.spec
-  Saturn.Unstable.Type.ScheduleSpec.spec
-  Saturn.Unstable.Type.WeekdaySpec.spec
-  Saturn.Unstable.Type.WildcardSpec.spec
-  SaturnSpec.spec
+  Saturn.Unstable.Type.DaySpec.spec heck
+  Saturn.Unstable.Type.ElementSpec.spec heck
+  Saturn.Unstable.Type.FieldSpec.spec heck
+  Saturn.Unstable.Type.HourSpec.spec heck
+  Saturn.Unstable.Type.MinuteSpec.spec heck
+  Saturn.Unstable.Type.MonthSpec.spec heck
+  Saturn.Unstable.Type.NumberSpec.spec heck
+  Saturn.Unstable.Type.RangeSpec.spec heck
+  Saturn.Unstable.Type.ScheduleSpec.spec heck
+  Saturn.Unstable.Type.WeekdaySpec.spec heck
+  Saturn.Unstable.Type.WildcardSpec.spec heck
+  SaturnSpec.spec heck
 
 heck :: Heck.Test IO (Hspec.SpecM ())
 heck =

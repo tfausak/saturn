@@ -3,404 +3,423 @@ module Saturn.Unstable.MatchSpec where
 import qualified Data.Fixed as Fixed
 import qualified Data.Time as Time
 import qualified Data.Time.Calendar.WeekDate as Time
+import qualified Heck
 import qualified Saturn.Unstable.Match as Match
 import qualified Saturn.Unstable.Type.ScheduleSpec as ScheduleSpec
 import qualified Test.Hspec as Hspec
 import qualified Test.QuickCheck as QuickCheck
 
-spec :: Hspec.Spec
-spec = Hspec.describe "Saturn.Unstable.Match" $ do
-  Hspec.describe "isMatch" $ do
-    Hspec.it "is always true with all wildcards"
+spec :: (Monad n) => Heck.Test IO n -> n ()
+spec t = Heck.describe t "Saturn.Unstable.Match" $ do
+  Heck.describe t "isMatch" $ do
+    Heck.it t "is always true with all wildcards"
+      . QuickCheck.quickCheck
       . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
       $ \utcTime -> do
         schedule <- ScheduleSpec.new [] [] [] [] []
         schedule `Hspec.shouldSatisfy` Match.isMatch utcTime
 
-    Hspec.it "is true when day or weekday matches" $ do
+    Heck.it t "is true when day or weekday matches" $ do
       s <- ScheduleSpec.new [] [] [[5]] [] [[5]]
       t1 <- newUtcTime 1970 1 5 0 0 0
       s `Hspec.shouldSatisfy` Match.isMatch t1
       t2 <- newUtcTime 1970 1 2 0 0 0
       s `Hspec.shouldSatisfy` Match.isMatch t2
 
-    Hspec.describe "minute" $ do
-      Hspec.it "is always true when a number matches"
+    Heck.describe t "minute" $ do
+      Heck.it t "is always true when a number matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [[5]] [] [] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withMinute 5 utcTime)
 
-      Hspec.it "is always true when a range matches"
+      Heck.it t "is always true when a range matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [[4, 5]] [] [] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withMinute 5 utcTime)
 
-      Hspec.it "is always true when a choice matches"
+      Heck.it t "is always true when a choice matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [[4], [5]] [] [] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withMinute 5 utcTime)
 
-      Hspec.it "is true when a number matches" $ do
-        t <- newUtcTime 1970 1 1 0 5 0
+      Heck.it t "is true when a number matches" $ do
+        x <- newUtcTime 1970 1 1 0 5 0
         s <- ScheduleSpec.new [[5]] [] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a number does not match" $ do
-        t <- newUtcTime 1970 1 1 0 6 0
+      Heck.it t "is false when a number does not match" $ do
+        x <- newUtcTime 1970 1 1 0 6 0
         s <- ScheduleSpec.new [[5]] [] [] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a range matches" $ do
-        t <- newUtcTime 1970 1 1 0 5 0
+      Heck.it t "is true when a range matches" $ do
+        x <- newUtcTime 1970 1 1 0 5 0
         s <- ScheduleSpec.new [[4, 5]] [] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a range does not match" $ do
-        t <- newUtcTime 1970 1 1 0 6 0
+      Heck.it t "is false when a range does not match" $ do
+        x <- newUtcTime 1970 1 1 0 6 0
         s <- ScheduleSpec.new [[4, 5]] [] [] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a choice matches" $ do
-        t <- newUtcTime 1970 1 1 0 5 0
+      Heck.it t "is true when a choice matches" $ do
+        x <- newUtcTime 1970 1 1 0 5 0
         s <- ScheduleSpec.new [[4], [5]] [] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a choice does not match" $ do
-        t <- newUtcTime 1970 1 1 0 6 0
+      Heck.it t "is false when a choice does not match" $ do
+        x <- newUtcTime 1970 1 1 0 6 0
         s <- ScheduleSpec.new [[4], [5]] [] [] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any second" $ do
-        t <- newUtcTime 1970 1 1 0 5 6
+      Heck.it t "accepts any second" $ do
+        x <- newUtcTime 1970 1 1 0 5 6
         s <- ScheduleSpec.new [[5]] [] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any hour" $ do
-        t <- newUtcTime 1970 1 1 6 5 0
+      Heck.it t "accepts any hour" $ do
+        x <- newUtcTime 1970 1 1 6 5 0
         s <- ScheduleSpec.new [[5]] [] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any day" $ do
-        t <- newUtcTime 1970 1 6 0 5 0
+      Heck.it t "accepts any day" $ do
+        x <- newUtcTime 1970 1 6 0 5 0
         s <- ScheduleSpec.new [[5]] [] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any month" $ do
-        t <- newUtcTime 1970 6 1 0 5 0
+      Heck.it t "accepts any month" $ do
+        x <- newUtcTime 1970 6 1 0 5 0
         s <- ScheduleSpec.new [[5]] [] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-    Hspec.describe "hour" $ do
-      Hspec.it "is always true when a number matches"
+    Heck.describe t "hour" $ do
+      Heck.it t "is always true when a number matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [[5]] [] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withHour 5 utcTime)
 
-      Hspec.it "is always true when a range matches"
+      Heck.it t "is always true when a range matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [[4, 5]] [] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withHour 5 utcTime)
 
-      Hspec.it "is always true when a choice matches"
+      Heck.it t "is always true when a choice matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [[4], [5]] [] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withHour 5 utcTime)
 
-      Hspec.it "is true when a number matches" $ do
-        t <- newUtcTime 1970 1 1 5 0 0
+      Heck.it t "is true when a number matches" $ do
+        x <- newUtcTime 1970 1 1 5 0 0
         s <- ScheduleSpec.new [] [[5]] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a number does not match" $ do
-        t <- newUtcTime 1970 1 1 6 0 0
+      Heck.it t "is false when a number does not match" $ do
+        x <- newUtcTime 1970 1 1 6 0 0
         s <- ScheduleSpec.new [] [[5]] [] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a range matches" $ do
-        t <- newUtcTime 1970 1 1 5 0 0
+      Heck.it t "is true when a range matches" $ do
+        x <- newUtcTime 1970 1 1 5 0 0
         s <- ScheduleSpec.new [] [[4, 5]] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a range does not match" $ do
-        t <- newUtcTime 1970 1 1 6 0 0
+      Heck.it t "is false when a range does not match" $ do
+        x <- newUtcTime 1970 1 1 6 0 0
         s <- ScheduleSpec.new [] [[4, 5]] [] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a choice matches" $ do
-        t <- newUtcTime 1970 1 1 5 0 0
+      Heck.it t "is true when a choice matches" $ do
+        x <- newUtcTime 1970 1 1 5 0 0
         s <- ScheduleSpec.new [] [[4], [5]] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a choice does not match" $ do
-        t <- newUtcTime 1970 1 1 6 0 0
+      Heck.it t "is false when a choice does not match" $ do
+        x <- newUtcTime 1970 1 1 6 0 0
         s <- ScheduleSpec.new [] [[4], [5]] [] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any second" $ do
-        t <- newUtcTime 1970 1 1 5 0 6
+      Heck.it t "accepts any second" $ do
+        x <- newUtcTime 1970 1 1 5 0 6
         s <- ScheduleSpec.new [] [[5]] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any minute" $ do
-        t <- newUtcTime 1970 1 1 5 6 0
+      Heck.it t "accepts any minute" $ do
+        x <- newUtcTime 1970 1 1 5 6 0
         s <- ScheduleSpec.new [] [[5]] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any day" $ do
-        t <- newUtcTime 1970 1 6 5 0 0
+      Heck.it t "accepts any day" $ do
+        x <- newUtcTime 1970 1 6 5 0 0
         s <- ScheduleSpec.new [] [[5]] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any month" $ do
-        t <- newUtcTime 1970 6 1 5 0 0
+      Heck.it t "accepts any month" $ do
+        x <- newUtcTime 1970 6 1 5 0 0
         s <- ScheduleSpec.new [] [[5]] [] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-    Hspec.describe "day" $ do
-      Hspec.it "is always true when a number matches"
+    Heck.describe t "day" $ do
+      Heck.it t "is always true when a number matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [[5]] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withDayOfMonth 5 utcTime)
 
-      Hspec.it "is always true when a range matches"
+      Heck.it t "is always true when a range matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [[4, 5]] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withDayOfMonth 5 utcTime)
 
-      Hspec.it "is always true when a choice matches"
+      Heck.it t "is always true when a choice matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [[4], [5]] [] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withDayOfMonth 5 utcTime)
 
-      Hspec.it "is true when a number matches" $ do
-        t <- newUtcTime 1970 1 5 0 0 0
+      Heck.it t "is true when a number matches" $ do
+        x <- newUtcTime 1970 1 5 0 0 0
         s <- ScheduleSpec.new [] [] [[5]] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a number does not match" $ do
-        t <- newUtcTime 1970 1 6 0 0 0
+      Heck.it t "is false when a number does not match" $ do
+        x <- newUtcTime 1970 1 6 0 0 0
         s <- ScheduleSpec.new [] [] [[5]] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a range matches" $ do
-        t <- newUtcTime 1970 1 5 0 0 0
+      Heck.it t "is true when a range matches" $ do
+        x <- newUtcTime 1970 1 5 0 0 0
         s <- ScheduleSpec.new [] [] [[4, 5]] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a range does not match" $ do
-        t <- newUtcTime 1970 1 6 0 0 0
+      Heck.it t "is false when a range does not match" $ do
+        x <- newUtcTime 1970 1 6 0 0 0
         s <- ScheduleSpec.new [] [] [[4, 5]] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a choice matches" $ do
-        t <- newUtcTime 1970 1 5 0 0 0
+      Heck.it t "is true when a choice matches" $ do
+        x <- newUtcTime 1970 1 5 0 0 0
         s <- ScheduleSpec.new [] [] [[4], [5]] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a choice does not match" $ do
-        t <- newUtcTime 1970 1 6 0 0 0
+      Heck.it t "is false when a choice does not match" $ do
+        x <- newUtcTime 1970 1 6 0 0 0
         s <- ScheduleSpec.new [] [] [[4], [5]] [] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any second" $ do
-        t <- newUtcTime 1970 1 5 0 0 6
+      Heck.it t "accepts any second" $ do
+        x <- newUtcTime 1970 1 5 0 0 6
         s <- ScheduleSpec.new [] [] [[5]] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any minute" $ do
-        t <- newUtcTime 1970 1 5 0 6 0
+      Heck.it t "accepts any minute" $ do
+        x <- newUtcTime 1970 1 5 0 6 0
         s <- ScheduleSpec.new [] [] [[5]] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any hour" $ do
-        t <- newUtcTime 1970 1 5 6 0 0
+      Heck.it t "accepts any hour" $ do
+        x <- newUtcTime 1970 1 5 6 0 0
         s <- ScheduleSpec.new [] [] [[5]] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any month" $ do
-        t <- newUtcTime 1970 6 5 0 0 0
+      Heck.it t "accepts any month" $ do
+        x <- newUtcTime 1970 6 5 0 0 0
         s <- ScheduleSpec.new [] [] [[5]] [] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-    Hspec.describe "month" $ do
-      Hspec.it "is always true when a number matches"
+    Heck.describe t "month" $ do
+      Heck.it t "is always true when a number matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [] [[5]] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withMonthOfYear 5 utcTime)
 
-      Hspec.it "is always true when a range matches"
+      Heck.it t "is always true when a range matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [] [[4, 5]] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withMonthOfYear 5 utcTime)
 
-      Hspec.it "is always true when a choice matches"
+      Heck.it t "is always true when a choice matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [] [[4], [5]] []
           schedule `Hspec.shouldSatisfy` Match.isMatch (withMonthOfYear 5 utcTime)
 
-      Hspec.it "is true when a number matches" $ do
-        t <- newUtcTime 1970 5 1 0 0 0
+      Heck.it t "is true when a number matches" $ do
+        x <- newUtcTime 1970 5 1 0 0 0
         s <- ScheduleSpec.new [] [] [] [[5]] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a number does not match" $ do
-        t <- newUtcTime 1970 6 1 0 0 0
+      Heck.it t "is false when a number does not match" $ do
+        x <- newUtcTime 1970 6 1 0 0 0
         s <- ScheduleSpec.new [] [] [] [[5]] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a range matches" $ do
-        t <- newUtcTime 1970 5 1 0 0 0
+      Heck.it t "is true when a range matches" $ do
+        x <- newUtcTime 1970 5 1 0 0 0
         s <- ScheduleSpec.new [] [] [] [[4, 5]] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a range does not match" $ do
-        t <- newUtcTime 1970 6 1 0 0 0
+      Heck.it t "is false when a range does not match" $ do
+        x <- newUtcTime 1970 6 1 0 0 0
         s <- ScheduleSpec.new [] [] [] [[4, 5]] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a choice matches" $ do
-        t <- newUtcTime 1970 5 1 0 0 0
+      Heck.it t "is true when a choice matches" $ do
+        x <- newUtcTime 1970 5 1 0 0 0
         s <- ScheduleSpec.new [] [] [] [[4], [5]] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a choice does not match" $ do
-        t <- newUtcTime 1970 6 1 0 0 0
+      Heck.it t "is false when a choice does not match" $ do
+        x <- newUtcTime 1970 6 1 0 0 0
         s <- ScheduleSpec.new [] [] [] [[4], [5]] []
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any second" $ do
-        t <- newUtcTime 1970 5 1 0 0 6
+      Heck.it t "accepts any second" $ do
+        x <- newUtcTime 1970 5 1 0 0 6
         s <- ScheduleSpec.new [] [] [] [[5]] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any minute" $ do
-        t <- newUtcTime 1970 5 1 0 6 0
+      Heck.it t "accepts any minute" $ do
+        x <- newUtcTime 1970 5 1 0 6 0
         s <- ScheduleSpec.new [] [] [] [[5]] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any hour" $ do
-        t <- newUtcTime 1970 5 1 6 0 0
+      Heck.it t "accepts any hour" $ do
+        x <- newUtcTime 1970 5 1 6 0 0
         s <- ScheduleSpec.new [] [] [] [[5]] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any day" $ do
-        t <- newUtcTime 1970 5 6 0 0 0
+      Heck.it t "accepts any day" $ do
+        x <- newUtcTime 1970 5 6 0 0 0
         s <- ScheduleSpec.new [] [] [] [[5]] []
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-    Hspec.describe "weekday" $ do
-      Hspec.it "is always true when a number matches"
+    Heck.describe t "weekday" $ do
+      Heck.it t "is always true when a number matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [] [] [[5]]
           schedule `Hspec.shouldSatisfy` Match.isMatch (withDayOfWeek Time.Friday utcTime)
 
-      Hspec.it "is always true when a range matches"
+      Heck.it t "is always true when a range matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [] [] [[4, 5]]
           schedule `Hspec.shouldSatisfy` Match.isMatch (withDayOfWeek Time.Friday utcTime)
 
-      Hspec.it "is always true when a choice matches"
+      Heck.it t "is always true when a choice matches"
+        . QuickCheck.quickCheck
         . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
         $ \utcTime -> do
           schedule <- ScheduleSpec.new [] [] [] [] [[4], [5]]
           schedule `Hspec.shouldSatisfy` Match.isMatch (withDayOfWeek Time.Friday utcTime)
 
-      Hspec.it "is true when a number matches" $ do
-        t <- newUtcTime 1970 1 2 0 0 0
+      Heck.it t "is true when a number matches" $ do
+        x <- newUtcTime 1970 1 2 0 0 0
         s <- ScheduleSpec.new [] [] [] [] [[5]]
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a number does not match" $ do
-        t <- newUtcTime 1970 1 3 0 0 0
+      Heck.it t "is false when a number does not match" $ do
+        x <- newUtcTime 1970 1 3 0 0 0
         s <- ScheduleSpec.new [] [] [] [] [[5]]
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a range matches" $ do
-        t <- newUtcTime 1970 1 2 0 0 0
+      Heck.it t "is true when a range matches" $ do
+        x <- newUtcTime 1970 1 2 0 0 0
         s <- ScheduleSpec.new [] [] [] [] [[4, 5]]
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a range does not match" $ do
-        t <- newUtcTime 1970 1 3 0 0 0
+      Heck.it t "is false when a range does not match" $ do
+        x <- newUtcTime 1970 1 3 0 0 0
         s <- ScheduleSpec.new [] [] [] [] [[4, 5]]
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "is true when a choice matches" $ do
-        t <- newUtcTime 1970 1 2 0 0 0
+      Heck.it t "is true when a choice matches" $ do
+        x <- newUtcTime 1970 1 2 0 0 0
         s <- ScheduleSpec.new [] [] [] [] [[4], [5]]
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "is false when a choice does not match" $ do
-        t <- newUtcTime 1970 1 3 0 0 0
+      Heck.it t "is false when a choice does not match" $ do
+        x <- newUtcTime 1970 1 3 0 0 0
         s <- ScheduleSpec.new [] [] [] [] [[4], [5]]
-        s `Hspec.shouldNotSatisfy` Match.isMatch t
+        s `Hspec.shouldNotSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any second" $ do
-        t <- newUtcTime 1970 1 2 0 0 6
+      Heck.it t "accepts any second" $ do
+        x <- newUtcTime 1970 1 2 0 0 6
         s <- ScheduleSpec.new [] [] [] [] [[5]]
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any minute" $ do
-        t <- newUtcTime 1970 1 2 0 6 0
+      Heck.it t "accepts any minute" $ do
+        x <- newUtcTime 1970 1 2 0 6 0
         s <- ScheduleSpec.new [] [] [] [] [[5]]
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any hour" $ do
-        t <- newUtcTime 1970 1 2 6 0 0
+      Heck.it t "accepts any hour" $ do
+        x <- newUtcTime 1970 1 2 6 0 0
         s <- ScheduleSpec.new [] [] [] [] [[5]]
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-      Hspec.it "accepts any day" $ do
-        t <- newUtcTime 1970 1 9 0 0 0
+      Heck.it t "accepts any day" $ do
+        x <- newUtcTime 1970 1 9 0 0 0
         s <- ScheduleSpec.new [] [] [] [] [[5]]
-        s `Hspec.shouldSatisfy` Match.isMatch t
+        s `Hspec.shouldSatisfy` Match.isMatch x
 
-  Hspec.describe "nextMatch" $ do
-    Hspec.it "succeeds with a leap day" $ do
+  Heck.describe t "nextMatch" $ do
+    Heck.it t "succeeds with a leap day" $ do
       s <- ScheduleSpec.new [[0]] [[0]] [[29]] [[2]] []
       t1 <- newUtcTime 1970 1 1 0 0 0
       t2 <- newUtcTime 1972 2 29 0 0 0
       Match.nextMatch t1 s `Hspec.shouldBe` Just t2
 
-    Hspec.it "succeeds with the next leap day" $ do
+    Heck.it t "succeeds with the next leap day" $ do
       s <- ScheduleSpec.new [[0]] [[0]] [[29]] [[2]] []
       t1 <- newUtcTime 1972 2 29 0 0 0
       t2 <- newUtcTime 1976 2 29 0 0 0
       Match.nextMatch t1 s `Hspec.shouldBe` Just t2
 
-    Hspec.it "succeeds with the furthest leap day" $ do
+    Heck.it t "succeeds with the furthest leap day" $ do
       s <- ScheduleSpec.new [[0]] [[0]] [[29]] [[2]] []
       t1 <- newUtcTime 1896 2 29 0 0 0
       t2 <- newUtcTime 1904 2 29 0 0 0
       Match.nextMatch t1 s `Hspec.shouldBe` Just t2
 
-    Hspec.it "fails with an impossible date" $ do
+    Heck.it t "fails with an impossible date" $ do
       s <- ScheduleSpec.new [[0]] [[0]] [[30]] [[2]] []
-      t <- newUtcTime 1970 1 1 0 0 0
-      Match.nextMatch t s `Hspec.shouldBe` Nothing
+      x <- newUtcTime 1970 1 1 0 0 0
+      Match.nextMatch x s `Hspec.shouldBe` Nothing
 
-    Hspec.it "is always in the future"
+    Heck.it t "is always in the future"
+      . QuickCheck.quickCheck
       . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
       $ \t1 -> do
         schedule <- ScheduleSpec.new [] [] [] [] []
         t2 <- maybe (fail "impossible") pure $ Match.nextMatch t1 schedule
         t2 `Hspec.shouldSatisfy` (>= t1)
 
-    Hspec.it "always matches"
+    Heck.it t "always matches"
+      . QuickCheck.quickCheck
       . QuickCheck.forAllShrink arbitraryUtcTime shrinkUtcTime
       $ \t1 -> do
         schedule <- ScheduleSpec.new [] [] [] [] []
