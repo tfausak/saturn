@@ -97,7 +97,6 @@ library
     SaturnSpec
 
   hs-source-dirs: source/library
-  visibility: public
 
 test-suite saturn-test-suite
   import: library
