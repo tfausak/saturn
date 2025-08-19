@@ -1,14 +1,16 @@
 module Saturn.Unstable.Type.NumberSpec where
 
 import qualified Data.Text.Lazy.Builder as Builder
+import qualified Heck
 import qualified Saturn.Unstable.Type.Number as Number
 import qualified Test.Hspec as Hspec
 import qualified Test.QuickCheck as QuickCheck
 import qualified Text.Parsec as Parsec
 
-spec :: Hspec.Spec
-spec = Hspec.describe "Saturn.Unstable.Type.Number" $ do
-  Hspec.it "round trips"
+spec :: Heck.Test IO n -> n ()
+spec t = Heck.describe t "Saturn.Unstable.Type.Number" $ do
+  Heck.it t "round trips"
+    . QuickCheck.quickCheck
     . QuickCheck.forAllShrink arbitrary shrink
     $ \x -> do
       Parsec.parse Number.parsec "" (Builder.toLazyText $ Number.toBuilder x)
