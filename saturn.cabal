@@ -49,7 +49,7 @@ library
     hspec ^>=2.11.8,
     parsec ^>=3.1.16.1,
     text ^>=2.1,
-    time ^>={1.14, 1.15},
+    time ^>={1.12.2, 1.14, 1.15},
 
   -- cabal-gild: discover source/library
   exposed-modules:
