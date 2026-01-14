@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: saturn
-version: 1.1.0.4
+version: 1.1.0.5
 synopsis: Handle POSIX cron schedules.
 description: Saturn handles POSIX cron schedules.
 build-type: Simple
