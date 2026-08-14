@@ -8,7 +8,7 @@ jobs:
       - uses: haskell/ghcup-setup@v1
         with:
           ghc: ${{ matrix.ghc }}
-          cabal: latest
+          cabal: 3.16.1.0
       - run: ghc-pkg list
       - run: cabal sdist --output-dir artifact
       - run: cabal configure --enable-documentation --enable-tests --flags=pedantic --haddock-for-hackage --jobs
