@@ -8,7 +8,7 @@ jobs:
       - uses: haskell/ghcup-setup@v1
         with:
           ghc: ${{ matrix.ghc }}
-          cabal: 3.16.1.0
+          cabal: latest
       - run: ghc-pkg list
       - run: cabal sdist --output-dir artifact
       - run: cabal configure --enable-documentation --enable-tests --flags=pedantic --haddock-for-hackage --jobs
@@ -33,7 +33,7 @@ jobs:
         with:
           name: saturn-${{ github.sha }}-${{ matrix.os }}-${{ matrix.ghc }}
           path: artifact.tar
-      - run: cabal run -- saturn-test-suite --randomize --strict
+      - run: cabal run saturn-test-suite -- --randomize --strict
     strategy:
       matrix:
         include:
